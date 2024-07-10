@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Retirement Calculator</title>
+
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Cinzel:wght@400..900&display=swap" rel="stylesheet">
+
+	<!-- Styles -->
+	<style>
+		*,
+		*::before,
+		*::after {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		html, 
+		body {
+			width: 100%;
+			overflow-x: hidden;
+		}
+
+		body {
+			font-family: Cabin, sans-serif;
+			font-weight: normal;
+			font-size: 20px;
+			line-height: 1.9;
+			background-color: #f5f5f5;
+			color: #666666;
+		}
+
+		h1, h2, h3, h4, h5, h6 {
+			font-family: Cinzel, serif;
+			font-weight: normal;
+			line-height: 1.2;
+		}
+
+		img {
+			display: block;
+			max-width: 100%;
+			height: auto;
+		}
+
+		.container {
+			width: min(1200px, 80%);
+			margin-inline: auto;
+			padding-block: 50px;
+		}
+
+		/* hide input:number arrows */
+		input[type=number],
+		input[type=number]::-webkit-outer-spin-button,
+		input[type=number]::-webkit-inner-spin-button {
+			-moz-appearance: textfield;
+			-webkit-appearance: none;
+			margin: 0;
+		}
+
+		/* button */
+		.btn--regular {
+			cursor: pointer;
+			display: block;
+			width: min(300px, 100% - 20px);
+			margin: 15px auto 0;
+			padding: 18px 10px;
+			border: 1px solid var(--clr-border);
+			border-radius: 5px;
+			text-align: center;
+			text-decoration: none;
+			font-weight: normal;
+			font-size: 18px;
+			line-height: 1;
+			color: #000;
+			background: #fff;
+			position: relative;
+			transition: all 0.5s ease;
+		}
+
+		.btn--regular:hover {
+			color: #fff;
+			background: var(--clr-primary-blue);
+			border-color: transparent;
+			box-shadow: 0px 0px 0px 5px var(--clr-primary-blue);
+		}
+
+		/* retirement calculator styles */
+		.ret-cat-whole-wrapper {
+			container-type: inline-size;
+			container-name: calculatorWrapper;
+		}
+
+		.ret-cal-container {
+			--clr-border: #D9D9D9;
+			--clr-primary-blue: #29abe2;
+			width: min(1200px, 100%);
+			margin-inline: auto;
+			color: #666666;
+			background: #fff;
+			border: 1px solid var(--clr-border);
+			border-radius: 10px;
+			display: flex;
+			font-family: Cabin, sans-serif;
+			font-weight: normal;
+			font-size: clamp(16px, 10px + 1vw, 20px);
+			line-height: 1.9;
+		}
+
+		:where(.ret-cal-container) a {
+			color: var(--clr-primary-blue);
+		}
+
+		.ret-cal-container hr {
+			border-color: var(--clr-border);
+		}
+
+		.ret-cal-container > * {
+			padding: 30px clamp(15px, 10px + 1vw, 30px);
+		}
+
+		.ret-cal-inputs {
+			flex: 0 0 auto;
+			width: min(420px, 40%);
+			min-width: min(225px, 50%);
+			border-right: 1px solid var(--clr-border);
+			line-height: 1.3;
+			container: inputsSidebar / inline-size;
+		}
+
+		.ret-cal-details {
+			flex: 1 1 auto;
+			container: details / inline-size;
+		}
+
+		.ret-cal-heading {
+			font-size: clamp(22px, 10px + 1.5vw, 30px);
+			text-transform: uppercase;
+			border-bottom: 1px solid var(--clr-border);
+			padding-bottom: 0.25em;
+		}
+
+		.ret-cal-inputs > * + * {
+			margin-top: clamp(30px, 10px + 2vw, 50px);
+		}
+
+		.ret-cal-inputs__group:last-child {
+			padding-top: 10px;
+			border-top: 1px solid var(--clr-border);
+		}
+
+		.ret-cal-container ul {
+			padding: 5px 0px 5px 30px;
+		}
+
+		.ret-cal-container li + li {
+			margin-top: 0.25em;
+		}
+
+		/**
+		* retirement calculator inputs
+		*/
+		.ret-cal-input-item {
+			padding-block: 10px;
+		}
+
+		.ret-cal-container :where(input, label, button) {
+			display: block;
+			width: 100%;
+			font: inherit;
+			color: inherit;
+		}
+
+		.ret-cal-container label {
+			display: inline-flex;
+			gap: 20px;
+			align-items: flex-start;
+		}
+
+		.ret-cal-input-item__info {
+			flex: 0 0 auto;
+			display: inline-block;
+			position: relative;
+			padding-top: 2px;
+		}
+
+		.ret-cal-input-item__info__btn {
+			cursor: pointer;
+			width: 16px;
+			padding: 0;
+			margin: 0;
+			background: transparent;
+			border: 0;
+			box-shadow: none;
+			outline: 0;
+			line-height: 1;
+			transition: all 0.3s ease;
+		}
+
+		.ret-cal-input-item__info__btn:where(:hover, :focus) {
+			border: 0;
+			color: var(--clr-primary-blue);
+		}
+
+		.ret-cal-input-item__info__btn > svg {
+			width: 100%;
+			height: auto;
+			transition: inherit;
+		}
+
+		.ret-cal-input-item__info__btn:where(:hover, :focus) > svg g {
+			border: 0;
+			stroke: var(--clr-primary-blue);
+		}
+
+		.ret-cal-input-item__info__text {
+			opacity: 0;
+			visibility: hidden;
+			position: absolute;
+			left: 50%;
+			bottom: 50%;
+			transform: translateX(-50%);
+			font-size: 14px;
+			line-height: 1.2;
+			text-align: center;
+			padding: 5px 10px;
+			background: #fff;
+			border: 1px solid var(--clr-border);
+			border-radius: 5px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+			width: max-content;
+			max-width: 90vw;
+			transition: all 0.3s ease;
+		}
+
+		.ret-cal-input-item__info:hover .ret-cal-input-item__info__text {
+			opacity: 1;
+			visibility: visible;
+			bottom: 100%;
+		}
+
+		.ret-cal-input__group {
+			display: flex;
+			align-items: center;
+			min-height: 46px;
+			border: 1px solid var(--clr-border);
+			border-radius: 5px;
+			margin-top: 5px;
+		}
+
+		.ret-cal-input__group > * {
+			border: 0;
+			padding: 5px 20px;
+			line-height: 1;
+		}
+
+		.ret-cal-input__group input {
+			flex: 1 1 auto;
+			min-width: 50px;
+			color: #000;
+		}
+
+		.ret-cal-input__group:has(input:focus) {
+			border-color: #000;
+		}
+
+		.ret-cal-input__group input::placeholder {
+			color: #ccc;
+		}
+
+		.ret-cal-input__group input:focus {
+			border: 0;
+			outline: 0;
+			box-shadow: 0;
+		}
+
+		.ret-cal-input__group__unit {
+			flex: 0 0 auto;
+			position: relative;
+		}
+
+		.ret-cal-input__group__unit::before {
+			content: "";
+			width: 1px;
+			height: 50%;
+			background: var(--clr-border);
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.ret-cal-input__group__unit.unit--start::before {
+			left: 100%;
+		}
+
+		.ret-cal-input__group__unit.unit--end::before {
+			right: 100%;
+		}
+
+		/* input range */
+		.ret-cal-input__custom-range-slider-wrapper {
+			margin-top: 10px;
+			padding-inline: 1px;
+			position: relative;
+			height: calc(var(--thumb-height) + 10px);
+			display: grid;
+			grid-template-columns: 1fr;
+			place-items: center;
+			overflow: hidden;
+			--track-height: 4px;
+			--track-bg: #ccc;
+			--track-radius: 50px;
+			--thumb-width: 1.25rem;
+			--thumb-height: 1.25rem;
+			--thumb-margin-top: calc((var(--track-height)/2) - (var(--thumb-height)/2));
+			--thumb-bg: #fff;
+			--thumb-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+			--thumb-radius: 50%;
+			--accent-clr: #2aaae2;
+			/* --thumb-progress: -100vw 0 0 100vw var(--clr-primary-blue); */
+		}
+
+		.ret-cal-inputs input[type="range"] {
+			grid-column: 1/1;
+			grid-row: 1/1;
+			-webkit-appearance: none;
+			appearance: none;
+			cursor: pointer;
+			width: 100%;
+			background: transparent;
+			border-radius: 0;
+			z-index: 2;
+		}
+
+		.ret-cal-inputs input[type="range"]:focus {
+			outline: none;
+		}
+
+		.ret-cal-inputs input[type="range"]::-webkit-slider-runnable-track {
+			height: var(--track-height);
+			background: var(--track-bg);
+			background: transparent;
+			border-radius: var(--track-radius);
+		}
+
+		.ret-cal-inputs input[type="range"]::-moz-range-track {
+			height: var(--track-height);
+			background: var(--track-bg);
+			background: transparent;
+			border-radius: var(--track-radius);
+		}
+
+		.ret-cal-inputs input[type="range"]::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			z-index: 10;
+			height: var(--thumb-height);
+			width: var(--thumb-width);
+			background-color: var(--thumb-bg);
+			box-shadow: var(--thumb-shadow);
+			border-radius: var(--thumb-radius);
+			margin-top: var(--thumb-margin-top);
+		}
+
+		.ret-cal-inputs input[type="range"]::-moz-range-thumb {
+			height: var(--thumb-height);
+			width: var(--thumb-width);
+			background-color: var(--thumb-bg);
+			box-shadow: var(--thumb-shadow);
+			border-radius: var(--thumb-radius);
+			margin-top: var(--thumb-margin-top);
+		}
+
+		.ret-cal-input__custom-range-tracks {
+			grid-column: 1/1;
+			grid-row: 1/1;
+			width: 100%;
+			height: var(--track-height);
+			position: relative;
+			border-radius: var(--track-radius);
+			overflow-x: hidden;
+		}
+
+		#custom_range_slider_bg {
+			width: 100%;
+			height: var(--track-height);
+			background-color: #ECECEC;
+			position: absolute;
+			top: 0;
+			left: 0;
+			border-radius: var(--track-radius);
+		}
+
+		#custom_range_slider_progress {
+			width: 100%;
+			height: 100%;
+			background-color: var(--clr-primary-blue);
+			border-radius: var(--track-radius);
+			position: absolute;
+			left: 0;
+			top: 0;
+			z-index: 1;
+			transform-origin: left;
+			transform: scaleX(0.25);
+		}
+
+		#ret-cal-input__contribution_target_indicator {
+			--target-bg: #252f53;
+			width: calc(100% - 2px);
+			height: var(--track-height);
+			background: var(--target-bg);
+			border-radius: var(--track-radius);
+			position: absolute;
+			left: 1px;
+			top: calc(50% - (var(--track-height)/2));
+			transform-origin: left;
+			transform: scaleX(0.55);
+		}
+
+		#ret-cal-input__contribution_target_indicator > span {
+			width: 3px;
+			height: calc(var(--track-height) + 6px);
+			background: var(--target-bg);
+			position: absolute;
+			right: 0;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+		.ret-cal-input__custom-range-slider-texts {
+			font-size: 75%;
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			text-align: center;
+			margin-top: 1px;
+		}
+
+		/* retirement calculator result-details */
+		.ret-cal-result__cols > * {
+			text-align: center;
+			color: #000;
+			padding: clamp(15px, 10px + 1vw, 20px);
+			margin-block: 15px;
+			border: 1px solid currentColor;
+			border-radius: 5px;
+			line-height: 1.5;
+		}
+
+		.result__col--need {
+			color: var(--clr-primary-blue);
+			border-color: var(--clr-border);
+		}
+
+		.ret-cal-result__col > p:last-child {
+			font-size: 150%;
+		}
+
+		.ret-cal-details > * + * {
+			margin-top: 20px;
+		}
+
+		.ret-cal-details > *:last-child {
+			text-align: center;
+			padding-top: 15px;
+			border-top: 1px solid var(--clr-border);
+		}
+
+		@container calculatorWrapper (max-width: 640px) {
+			.ret-cal-container {
+				display: block;
+			}
+			.ret-cal-container > * {
+				width: 100% !important;
+			}
+			.ret-cal-inputs {
+				border: 0;
+				position: relative;
+			}
+			.ret-cal-inputs:before {
+				content: "";
+				width: 100%;
+				height: 1px;
+				background: repeating-linear-gradient(to right, transparent, transparent 10px, var(--clr-border) 10px, var(--clr-border) 20px) repeat-x center;
+				position: absolute;
+				bottom: -5px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+		}
+
+		@container inputsSidebar (min-width: 350px) {
+			.ret-cal-input-cols {
+				display: flex;
+				column-gap: 15px;
+			}
+			.ret-cal-input-cols.cols-2 > * {
+				flex: 1 1 50%;
+			}
+		}
+
+		@container details (min-width: 400px) {
+			.ret-cal-result__cols {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 20px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<section>
+		<div class="container">
+
+			<form class="ret-cal-whole-wrapper">
+				<div class="ret-cal-container">
+					<!-- calculator inputs -->
+					<div class="ret-cal-inputs">
+						<div class="ret-cal-inputs__group">
+							<h4 class="ret-cal-heading">Present</h4>
+							<div class="ret-cal-input-item">
+								<label for="age_present">Your Age</label>
+								<div class="ret-cal-input__group">
+									<input type="number" name="age_present" id="age_present" inputmode="numeric" placeholder="25" value="25" min="18">
+									<span class="ret-cal-input__group__unit unit--end">Years</span>
+								</div>
+							</div>
+							<div class="ret-cal-input-cols cols-2">
+								<div class="ret-cal-input-item">
+									<label for="annual_income">
+										Annual Income
+										<div class="ret-cal-input-item__info">
+											<button type="button" class="ret-cal-input-item__info__btn">
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 16 16"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="1.5" d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"/><path stroke-width="2" d="M7.996 10.667h.006"/></g></svg>
+											</button>
+											<div class="ret-cal-input-item__info__text">Annual income info text...</div>
+										</div>
+									</label>
+									<div class="ret-cal-input__group">
+										<span class="ret-cal-input__group__unit unit--start">&dollar;</span>
+										<input type="number" name="annual_income" id="annual_income" inputmode="numeric" placeholder="120,000" value="120000" min="500">
+									</div>
+								</div>
+								<div class="ret-cal-input-item">
+									<label for="increment">
+										Increment
+										<div class="ret-cal-input-item__info">
+											<button type="button" class="ret-cal-input-item__info__btn">
+												<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 16 16"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="1.5" d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"/><path stroke-width="2" d="M7.996 10.667h.006"/></g></svg>
+											</button>
+											<div class="ret-cal-input-item__info__text">Increment info text...</div>
+										</div>
+									</label>
+									<div class="ret-cal-input__group">
+										<input type="number" name="increment" id="increment" inputmode="numeric" placeholder="3" value="3" min="0">
+										<span class="ret-cal-input__group__unit unit--end">&percnt;</span>
+									</div>
+								</div>
+							</div>
+							<div class="ret-cal-input-item">
+								<label for="current_savings">Current Savings</label>
+								<div class="ret-cal-input__group">
+									<span class="ret-cal-input__group__unit unit--start">&dollar;</span>
+									<input type="number" name="current_savings" id="current_savings" inputmode="numeric" placeholder="2,300" value="2300" min="0">
+								</div>
+							</div>
+							<div class="ret-cal-input-item">
+								<label for="monthly_contribution">
+									Your Monthly Contribution
+									<div class="ret-cal-input-item__info">
+										<button type="button" class="ret-cal-input-item__info__btn">
+											<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 16 16"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="1.5" d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"/><path stroke-width="2" d="M7.996 10.667h.006"/></g></svg>
+										</button>
+										<div class="ret-cal-input-item__info__text">Monthly contribution info text...</div>
+									</div>
+								</label>
+								<div class="ret-cal-input__group">
+									<span class="ret-cal-input__group__unit unit--start">&dollar;</span>
+									<input type="number" name="monthly_contribution" id="monthly_contribution" inputmode="numeric" placeholder="2,500" value="2500" min="0" max="10000" step="100">
+								</div>
+								<div class=" ret-cal-input__group--range">
+									<div class="ret-cal-input__custom-range-slider-wrapper">
+										<input type="range" name="monthly_contribution_range" id="monthly_contribution_range" value="2500" min="0" max="10000" step="100">
+										<div class="ret-cal-input__custom-range-tracks">
+											<div id="custom_range_slider_bg"></div>
+											<div id="custom_range_slider_progress"></div>
+										</div>
+										<div id="ret-cal-input__contribution_target_indicator"><span></span></div>
+									</div>
+									<div class="ret-cal-input__custom-range-slider-texts">
+										<p>$<span id="ret-cal-input__custom-range-min">0</span></p>
+										<p>Target: $<span id="monthly_contribution_target">5.5K</span></p>
+										<p>$<span id="ret-cal-input__custom-range-max">10</span>K</p>
+									</div>
+								</div>
+							</div>
+						</div>
+	
+						<div class="ret-cal-inputs__group">
+							<h4 class="ret-cal-heading">Retirement</h4>
+							<div class="ret-cal-input-item">
+								<label for="age_retirement">Desired Retirement Age</label>
+								<div class="ret-cal-input__group">
+									<input type="number" name="age_retirement" id="age_retirement" inputmode="numeric" placeholder="60" value="60" min="20">
+									<span class="ret-cal-input__group__unit unit--end">Years</span>
+								</div>
+							</div>
+							<div class="ret-cal-input-item">
+								<label for="retirement_annual_budget">
+									Annual Budget in Retirement
+									<div class="ret-cal-input-item__info">
+										<button type="button" class="ret-cal-input-item__info__btn">
+											<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 16 16"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="1.5" d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"/><path stroke-width="2" d="M7.996 10.667h.006"/></g></svg>
+										</button>
+										<div class="ret-cal-input-item__info__text">Annual budget info text...</div>
+									</div>
+								</label>
+								<div class="ret-cal-input__group">
+									<span class="ret-cal-input__group__unit unit--start">&dollar;</span>
+									<input type="number" name="retirement_annual_budget" id="retirement_annual_budget" min="0" step="100" inputmode="numeric" placeholder="65,000" value="65000" min="100">
+								</div>
+							</div>
+							<div class="ret-cal-input-item">
+								<label for="return_rate">
+									Rate of Return
+									<div class="ret-cal-input-item__info">
+										<button type="button" class="ret-cal-input-item__info__btn">
+											<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 16 16"><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="1.5" d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"/><path stroke-width="2" d="M7.996 10.667h.006"/></g></svg>
+										</button>
+										<div class="ret-cal-input-item__info__text">Return rate info text...</div>
+									</div>
+								</label>
+								<div class="ret-cal-input__group">
+									<input type="number" name="return_rate" id="return_rate" inputmode="numeric" placeholder="6" value="6" min="0">
+									<span class="ret-cal-input__group__unit unit--end">&percnt;</span>
+								</div>
+							</div>
+						</div>
+	
+						<div class="ret-cal-inputs__group">
+							<p><small>This calculator assumes a 2% annual inflation rate.</small></p>
+						</div>
+					</div>
+	
+					<!--  calculator result-details -->
+					<div class="ret-cal-details">
+						<div class="ret-cal-result">
+							<p>Based on the information you provided, in your retirement at age <span id="retirement_age_text">60</span>:</p>
+							<div class="ret-cal-result__cols cols-2">
+								<div class="ret-cal-result__col result__col--have">
+									<p>You Will Have</p>
+									<p><strong>&dollar;<span id="result_have">131,150</span></strong></p>
+								</div>
+								<div class="ret-cal-result__col result__col--need">
+									<p>You Will Need</p>
+									<p><strong>&dollar;<span id="result_need">165,150</span></strong></p>
+								</div>
+							</div>
+							<div class="ret-cal-result__chart-wrapper">
+								<img src="./ret-cal-result-chart.png" alt="Retirement calculator result chart view">
+							</div>
+						</div>
+	
+						<div class="ret-cal-desc">
+							<h4 class="ret-cal-heading">Will this be enough?</h4>
+							<p>How much you&apos;ll need is driven by how much you plan to spend in retirement. A Stonewater Financial advisor can help you:</p>
+							<ul>
+								<li>Get a handle on what you spend each year right now.</li>
+								<li>Walk through how your expenses may change later in life.</li>
+								<li>Identify and factor in outside sources of income such as Social Security.</li>
+								<li>See where you stand with your current retirement planning using our established <a href="#">6-step Process</a>.</li>
+							</ul>
+						</div>
+	
+						<div class="ret-cal-desc">
+							<p>Meet with Steven Bernstein for a complimentary retirement analysis.</p>
+							<a href="https://stonewaterfinancial.com/contact-us/" target="_blank" class="btn--regular">Book an Appointment</a>
+						</div>
+					</div>
+				</div>
+			</form>
+
+		</div>
+	</section>
+
+
+
+	<!-- custom scripts -->
+	<script>
+		window.onload = e => {
+			const monthlyContributionInputEl = document.getElementById('monthly_contribution');
+			const monthlyContributionRangeEl = document.getElementById('monthly_contribution_range');
+			const monthlyContributionRangeMin = document.getElementById('monthly_contribution_range').getAttribute('min');
+			const monthlyContributionRangeMax = document.getElementById('monthly_contribution_range').getAttribute('max');
+
+			// Update contribution range's min-max text
+			document.getElementById('ret-cal-input__custom-range-min').innerText = monthlyContributionRangeMin/1000;
+			document.getElementById('ret-cal-input__custom-range-max').innerText = monthlyContributionRangeMax/1000;
+
+			// Custom input range progress
+			const sliderProgress = document.getElementById('custom_range_slider_progress');
+
+			// Custom input range progress handler
+			function customInputRangeProgressHandler() {
+				const progress = (monthlyContributionRangeEl.value / monthlyContributionRangeEl.getAttribute('max') * 100).toPrecision(4);
+				sliderProgress.style.transform = `scaleX(${progress/100})`;
+			}
+			customInputRangeProgressHandler();
+
+			// IIFE to update on saved or loaded values
+			// (function(){
+			// 	const progress = (monthlyContributionRangeEl.value / monthlyContributionRangeEl.getAttribute('max') * 100).toPrecision(4);
+			// 	sliderProgress.style.transform = `scaleX(${progress/100})`;
+			// })();
+
+			// Initial object to store input values
+			const inputValues = {};
+
+			// Get all input fields
+			const inputs = document.querySelectorAll('form input');
+
+			// Function to update the object on input change
+			function updateObject(event) {
+				const { name, value } = event.target;
+				inputValues[name] = value;
+				console.log(inputValues);
+			}
+
+			// Prepopulate the object with initial input values
+			inputs.forEach(input => {
+				inputValues[input.name] = input.value;
+
+				input.addEventListener('input', updateObject);
+			});
+
+			// Add event listeners to each input field
+			// inputs.forEach(input => {
+			// 	input.addEventListener('input', updateObject);
+			// });
+			
+			/**
+			* Synchronize number and range inputs
+			*/
+			// Update range input when number input changes
+			monthlyContributionInputEl.addEventListener('input', () => {
+				monthlyContributionRangeEl.value = monthlyContributionInputEl.value;
+				inputValues['monthly_contribution_range'] = monthlyContributionInputEl.value;
+				// update custom input range progress
+				customInputRangeProgressHandler();
+			});
+
+			// Update number input when range input changes
+			monthlyContributionRangeEl.addEventListener('input', () => {
+				monthlyContributionInputEl.value = monthlyContributionRangeEl.value;
+				inputValues['monthly_contribution'] = monthlyContributionRangeEl.value;
+				// update custom input range progress
+				customInputRangeProgressHandler();
+			});
+		}
+	</script>
+</body>
+</html>
