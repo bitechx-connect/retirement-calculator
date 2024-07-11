@@ -781,7 +781,65 @@
 			});
 
 
-			
+			/**
+			* Chart
+			*/
+			var chartOptions = {
+				series: [{
+					name: 'You will have',
+					data: [24, 18, 35, 45, 58, 55, 50, 60, 65, 70]
+				}, {
+					name: 'You will need',
+					data: [30, 26, 45, 60, 66, 66, 65, 68, 75, 80]
+				}],
+				chart: {
+					type: 'bar',
+					height: 350
+				},
+				plotOptions: {
+					bar: {
+						horizontal: false,
+						columnWidth: '75%',
+						endingShape: 'rounded'
+					},
+				},
+				dataLabels: {
+					enabled: false,
+					style: {
+						colors: ['#252f52', '#29abe2'],
+					}
+				},
+				markers: {
+					colors: ['#252f52', '#29abe2'],
+				},
+				stroke: {
+					show: true,
+					width: 2,
+					colors: ['transparent']
+				},
+				xaxis: {
+					categories: ['10 years', '20 years', '30 years', '40 years', '50 years', '60 years', '70 years', '80 years', '90 years', '100 years'],
+				},
+				yaxis: {
+					title: {
+						text: '$ (thousands)'
+					}
+				},
+				fill: {
+					colors: ['#252f52', '#29abe2'],
+					opacity: 1
+				},
+				tooltip: {
+					y: {
+						formatter: function (val) {
+							return "$ " + val + " thousands"
+						}
+					}
+				}
+			};
+
+			var retirementCalculatorResultChart = new ApexCharts(document.querySelector("#retirement_calculator_result_chart"), chartOptions);
+			retirementCalculatorResultChart.render();
 		}
 	</script>
 </body>
