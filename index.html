@@ -90,7 +90,7 @@
 		}
 
 		/* retirement calculator styles */
-		.ret-cat-whole-wrapper {
+		.ret-cal-whole-wrapper {
 			container-type: inline-size;
 			container-name: calculatorWrapper;
 		}
@@ -469,6 +469,14 @@
 			border-top: 1px solid var(--clr-border);
 		}
 
+		/**
+		* Chart
+		*/
+		#retirement_calculator_result_chart {
+			width: min(1000px, 100%);
+			margin: 20px auto;
+		}
+
 		@container calculatorWrapper (max-width: 640px) {
 			.ret-cal-container {
 				display: block;
@@ -660,6 +668,7 @@
 								</div>
 							</div>
 							<div class="ret-cal-result__chart-wrapper">
+								<div id="retirement_calculator_result_chart"></div>
 								<img src="./ret-cal-result-chart.png" alt="Retirement calculator result chart view">
 							</div>
 						</div>
@@ -688,6 +697,9 @@
 
 
 
+	<!-- Scripts -->
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 	<!-- custom scripts -->
 	<script>
 		window.onload = e => {
@@ -695,6 +707,9 @@
 			const monthlyContributionRangeEl = document.getElementById('monthly_contribution_range');
 			const monthlyContributionRangeMin = document.getElementById('monthly_contribution_range').getAttribute('min');
 			const monthlyContributionRangeMax = document.getElementById('monthly_contribution_range').getAttribute('max');
+			const retirementAgeInputEl = document.getElementById('age_retirement');
+			const retirementAgeText = document.getElementById('retirement_age_text');
+			const monthlyContributionTargetEl = document.getElementById('monthly_contribution_target');
 
 			// Update contribution range's min-max text
 			document.getElementById('ret-cal-input__custom-range-min').innerText = monthlyContributionRangeMin/1000;
@@ -759,6 +774,14 @@
 				// update custom input range progress
 				customInputRangeProgressHandler();
 			});
+
+			// Update retirement age on the result side
+			retirementAgeInputEl.addEventListener('input', function() {
+				retirementAgeText.innerText = this.value;
+			});
+
+
+			
 		}
 	</script>
 </body>
