@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRSP Retirement Planning Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        label, input, output {
+            display: block;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .result {
+            font-weight: bold;
+        }
+        #chart {
+            margin-top: 20px;
+        }
+    </style>
+    <!-- Include ApexCharts library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>RRSP Retirement Planning Calculator</h1>
+        <label for="age_present">Present Age</label>
+        <input type="number" id="age_present" value="30" min="0">
+
+        <label for="annual_income">Current Annual Income</label>
+        <input type="number" id="annual_income" value="50000" min="0">
+
+        <label for="increment">Increment (%)</label>
+        <input type="number" id="increment" value="3" min="0">
+
+        <label for="current_savings">Current Savings</label>
+        <input type="number" id="current_savings" value="10000" min="0">
+
+        <label for="monthly_contribution">Monthly Contribution</label>
+        <input type="number" id="monthly_contribution" value="500" min="0" max="10000" step="100">
+        <input type="range" id="monthly_contribution_range" value="500" min="0" max="10000" step="100">
+
+        <label for="age_retirement">Desired Retirement Age</label>
+        <input type="number" id="age_retirement" value="65" min="0">
+
+        <label for="retirement_annual_income">Desired Retirement Annual Income</label>
+        <input type="number" id="retirement_annual_income" value="40000" min="0">
+
+        <label for="return_rate">Rate of Return (%)</label>
+        <input type="number" id="return_rate" value="5" min="0">
+
+        <div class="result">
+            <p>Projected Balance on Retirement: <span id="result_have">0.00</span></p>
+            <p>Required Amount to be Saved for Retirement: <span id="result_need">0.00</span></p>
+            <p>Amount to be Saved Monthly: <span id="monthly_contribution_target">0.0</span></p>
+        </div>
+
+        <div id="chart"></div>
+    </div>
+
+    <script>
+        // Get references to input elements
+        const agePresent = document.getElementById('age_present');
+        const annualIncome = document.getElementById('annual_income');
+        const increment = document.getElementById('increment');
+        const currentSavings = document.getElementById('current_savings');
+        const monthlyContribution = document.getElementById('monthly_contribution');
+        const monthlyContributionRange = document.getElementById('monthly_contribution_range');
+        const ageRetirement = document.getElementById('age_retirement');
+        const retirementAnnualIncome = document.getElementById('retirement_annual_income');
+        const returnRate = document.getElementById('return_rate');
+
+        // Get references to result display elements
+        const resultHave = document.getElementById('result_have');
+        const resultNeed = document.getElementById('result_need');
+        const monthlyContributionTarget = document.getElementById('monthly_contribution_target');
+
+        // Define constant variables
+        const inflationRate = 0.02;
+        const lifespan = 100;
+
+        // Synchronize the value between the input field and the range slider for monthly contributions
+        function updateMonthlyContribution() {
+            monthlyContributionRange.value = monthlyContribution.value;
+            calculate();
+        }
+
+        function updateMonthlyContributionRange() {
+            monthlyContribution.value = monthlyContributionRange.value;
+            calculate();
+        }
+
+        monthlyContribution.addEventListener('input', updateMonthlyContribution);
+        monthlyContributionRange.addEventListener('input', updateMonthlyContributionRange);
+
+        // Function to calculate the projected retirement savings and required savings
+        function calculate() {
+            const agePresentValue = parseFloat(agePresent.value) || 0;
+            const annualIncomeValue = parseFloat(annualIncome.value) || 0;
+            const incrementValue = parseFloat(increment.value) / 100 || 0;
+            const currentSavingsValue = parseFloat(currentSavings.value) || 0;
+            const monthlyContributionValue = parseFloat(monthlyContribution.value) || 0;
+            const ageRetirementValue = parseFloat(ageRetirement.value) || 0;
+            const retirementAnnualIncomeValue = parseFloat(retirementAnnualIncome.value) || 0;
+            const returnRateValue = parseFloat(returnRate.value) / 100 || 0;
+
+            const yearsToRetirement = ageRetirementValue - agePresentValue;
+            const monthsToRetirement = yearsToRetirement * 12;
+            const yearsOfRetirement = lifespan - ageRetirementValue;
+
+            // Calculate the future value of current savings
+            const FVCurrentSavings = currentSavingsValue * Math.pow((1 + returnRateValue), yearsToRetirement);
+
+            // Calculate the future value of monthly contributions
+            const FVMonthlyContributions = monthlyContributionValue * 12 * ((Math.pow((1 + returnRateValue), yearsToRetirement) - 1) / returnRateValue);
+
+            // Calculate the projected balance on retirement
+            const projectedBalance = FVCurrentSavings + FVMonthlyContributions;
+            resultHave.textContent = projectedBalance.toFixed(2);
+
+            // Calculate the required savings for desired retirement income
+            const requiredSavings = retirementAnnualIncomeValue * ((Math.pow((1 + inflationRate), yearsOfRetirement) - 1) / (returnRateValue - inflationRate)) / Math.pow((1 + inflationRate), yearsOfRetirement);
+            resultNeed.textContent = requiredSavings.toFixed(2);
+
+            // Calculate the additional monthly contribution needed
+            const additionalSavingsNeeded = requiredSavings - projectedBalance;
+            let additionalMonthlyContribution = 0;
+            if (additionalSavingsNeeded > 0) {
+                additionalMonthlyContribution = (additionalSavingsNeeded * returnRateValue) / (12 * (Math.pow((1 + returnRateValue), monthsToRetirement) - 1));
+            }
+            monthlyContributionTarget.textContent = (additionalMonthlyContribution / 1000).toFixed(1);
+
+            // Update the chart with the new values
+            updateChart(projectedBalance, requiredSavings);
+        }
+
+        // Function to update the ApexCharts chart
+        function updateChart(projectedBalance, requiredSavings) {
+            const chart = ApexCharts.exec('balanceChart', 'updateSeries', [
+                {
+                    name: 'Balance',
+                    data: [projectedBalance]
+                },
+                {
+                    name: 'Required Balance',
+                    data: [requiredSavings]
+                }
+            ]);
+        }
+
+        // Initialize the ApexCharts chart
+        function initializeChart() {
+            const options = {
+                chart: {
+                    type: 'bar',
+                    id: 'balanceChart'
+                },
+                series: [
+                    {
+                        name: 'Balance',
+                        data: [0]
+                    },
+                    {
+                        name: 'Required Balance',
+                        data: [0]
+                    }
+                ],
+                xaxis: {
+                    categories: ['Retirement Savings']
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        }
+
+        // Add event listeners to all input fields to trigger calculation on blur (when input field loses focus)
+        agePresent.addEventListener('blur', calculate);
+        annualIncome.addEventListener('blur', calculate);
+        increment.addEventListener('blur', calculate);
+        currentSavings.addEventListener('blur', calculate);
+        ageRetirement.addEventListener('blur', calculate);
+        retirementAnnualIncome.addEventListener('blur', calculate);
+        returnRate.addEventListener('blur', calculate);
+
+        // Initialize the chart and perform the initial calculation
+        initializeChart();
+        calculate();
+    </script>
+</body>
+</html>
