@@ -15,52 +15,6 @@
 
     <!-- Styles -->
     <style>
-      *,
-      *::before,
-      *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        width: 100%;
-        overflow-x: hidden;
-      }
-
-      body {
-        font-family: Cabin, sans-serif;
-        font-weight: normal;
-        font-size: 20px;
-        line-height: 1.9;
-        background-color: #f5f5f5;
-        color: #666666;
-      }
-
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: Cinzel, serif;
-        font-weight: normal;
-        line-height: 1.2;
-      }
-
-      img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-      }
-
-      .container {
-        width: min(1200px, 80%);
-        margin-inline: auto;
-        padding-block: 50px;
-      }
-
       /* hide input:number arrows */
       input[type="number"],
       input[type="number"]::-webkit-outer-spin-button,
@@ -87,6 +41,7 @@
         color: #000;
         background: #fff;
         position: relative;
+        -webkit-transition: all 0.5s ease;
         transition: all 0.5s ease;
       }
 
@@ -94,6 +49,7 @@
         color: #fff;
         background: var(--clr-primary-blue);
         border-color: transparent;
+        -webkit-box-shadow: 0px 0px 0px 5px var(--clr-primary-blue);
         box-shadow: 0px 0px 0px 5px var(--clr-primary-blue);
       }
 
@@ -112,6 +68,8 @@
         background: #fff;
         border: 1px solid var(--clr-border);
         border-radius: 10px;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
         font-family: Cabin, sans-serif;
         font-weight: normal;
@@ -132,6 +90,8 @@
       }
 
       .ret-cal-inputs {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         width: min(420px, 40%);
         min-width: min(225px, 50%);
@@ -142,6 +102,8 @@
       }
 
       .ret-cal-details {
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
         flex: 1 1 auto;
         container: details / inline-size;
       }
@@ -171,8 +133,8 @@
       }
 
       /**
-		* retirement calculator inputs
-		*/
+			* retirement calculator inputs
+			*/
       .ret-cal-input-item {
         padding-block: 10px;
       }
@@ -185,12 +147,18 @@
       }
 
       .ret-cal-container label {
+        display: -webkit-inline-box;
+        display: -ms-inline-flexbox;
         display: inline-flex;
         gap: 20px;
+        -webkit-box-align: start;
+        -ms-flex-align: start;
         align-items: flex-start;
       }
 
       .ret-cal-input-item__info {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         display: inline-block;
         position: relative;
@@ -204,9 +172,11 @@
         margin: 0;
         background: transparent;
         border: 0;
+        -webkit-box-shadow: none;
         box-shadow: none;
         outline: 0;
         line-height: 1;
+        -webkit-transition: all 0.3s ease;
         transition: all 0.3s ease;
       }
 
@@ -218,6 +188,7 @@
       .ret-cal-input-item__info__btn > svg {
         width: 100%;
         height: auto;
+        -webkit-transition: inherit;
         transition: inherit;
       }
 
@@ -232,6 +203,7 @@
         position: absolute;
         left: 50%;
         bottom: 50%;
+        -webkit-transform: translateX(-50%);
         transform: translateX(-50%);
         font-size: 15px;
         line-height: 1.2;
@@ -241,8 +213,10 @@
         color: #121212;
         border: 1px solid var(--clr-border);
         border-radius: 5px;
+        -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         width: min(280px, 75vw);
+        -webkit-transition: all 0.3s ease;
         transition: all 0.3s ease;
       }
 
@@ -253,7 +227,11 @@
       }
 
       .ret-cal-input__group {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
         align-items: center;
         min-height: 46px;
         border: 1px solid var(--clr-border);
@@ -268,6 +246,8 @@
       }
 
       .ret-cal-input__group input {
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
         flex: 1 1 auto;
         min-width: 50px;
         color: #000;
@@ -277,6 +257,22 @@
         border-color: #000;
       }
 
+      .ret-cal-input__group input::-webkit-input-placeholder {
+        color: #ccc;
+      }
+
+      .ret-cal-input__group input::-moz-placeholder {
+        color: #ccc;
+      }
+
+      .ret-cal-input__group input:-ms-input-placeholder {
+        color: #ccc;
+      }
+
+      .ret-cal-input__group input::-ms-input-placeholder {
+        color: #ccc;
+      }
+
       .ret-cal-input__group input::placeholder {
         color: #ccc;
       }
@@ -284,10 +280,13 @@
       .ret-cal-input__group input:focus {
         border: 0;
         outline: 0;
+        -webkit-box-shadow: 0;
         box-shadow: 0;
       }
 
       .ret-cal-input__group__unit {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         position: relative;
       }
@@ -299,6 +298,7 @@
         background: var(--clr-border);
         position: absolute;
         top: 50%;
+        -webkit-transform: translateY(-50%);
         transform: translateY(-50%);
       }
 
@@ -316,7 +316,9 @@
         padding-inline: 1px;
         position: relative;
         height: calc(var(--thumb-height) + 10px);
+        display: -ms-grid;
         display: grid;
+        -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
         place-items: center;
         overflow: hidden;
@@ -334,9 +336,12 @@
       }
 
       .ret-cal-inputs input[type="range"] {
+        -ms-grid-column: 1;
         grid-column: 1/1;
+        -ms-grid-row: 1;
         grid-row: 1/1;
         -webkit-appearance: none;
+        -moz-appearance: none;
         appearance: none;
         cursor: pointer;
         width: 100%;
@@ -370,6 +375,7 @@
         height: var(--thumb-height);
         width: var(--thumb-width);
         background-color: var(--thumb-bg);
+        -webkit-box-shadow: var(--thumb-shadow);
         box-shadow: var(--thumb-shadow);
         border-radius: var(--thumb-radius);
         margin-top: var(--thumb-margin-top);
@@ -385,7 +391,9 @@
       }
 
       .ret-cal-input__custom-range-tracks {
+        -ms-grid-column: 1;
         grid-column: 1/1;
+        -ms-grid-row: 1;
         grid-row: 1/1;
         width: 100%;
         height: var(--track-height);
@@ -413,7 +421,9 @@
         left: 0;
         top: 0;
         z-index: 1;
+        -webkit-transform-origin: left;
         transform-origin: left;
+        -webkit-transform: scaleX(0.25);
         transform: scaleX(0.25);
       }
 
@@ -426,7 +436,9 @@
         position: absolute;
         left: 1px;
         top: calc(50% - (var(--track-height) / 2));
+        -webkit-transform-origin: left;
         transform-origin: left;
+        -webkit-transform: scaleX(0.55);
         transform: scaleX(0.55);
       }
 
@@ -437,12 +449,15 @@
         position: absolute;
         right: 0;
         top: 50%;
+        -webkit-transform: translateY(-50%);
         transform: translateY(-50%);
       }
 
       .ret-cal-input__custom-range-slider-texts {
         font-size: 75%;
+        display: -ms-grid;
         display: grid;
+        -ms-grid-columns: auto 1fr auto;
         grid-template-columns: auto 1fr auto;
         text-align: center;
         margin-top: 1px;
@@ -479,8 +494,8 @@
       }
 
       /**
-		* Chart
-		*/
+			* Chart
+			*/
       #retirement_calculator_result_chart {
         width: min(1000px, 100%);
         margin: 20px auto;
@@ -490,13 +505,16 @@
         .ret-cal-container {
           display: block;
         }
+
         .ret-cal-container > * {
           width: 100% !important;
         }
+
         .ret-cal-inputs {
           border: 0;
           position: relative;
         }
+
         .ret-cal-inputs:before {
           content: "";
           width: 100%;
@@ -512,23 +530,33 @@
           position: absolute;
           bottom: -5px;
           left: 50%;
+          -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
         }
       }
 
       @container inputsSidebar (min-width: 350px) {
         .ret-cal-input-cols {
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
+          -webkit-column-gap: 15px;
+          -moz-column-gap: 15px;
           column-gap: 15px;
         }
+
         .ret-cal-input-cols.cols-2 > * {
+          -webkit-box-flex: 1;
+          -ms-flex: 1 1 50%;
           flex: 1 1 50%;
         }
       }
 
       @container details (min-width: 400px) {
         .ret-cal-result__cols {
+          display: -ms-grid;
           display: grid;
+          -ms-grid-columns: 1fr 20px 1fr;
           grid-template-columns: repeat(2, 1fr);
           gap: 20px;
         }
@@ -536,11 +564,15 @@
 
       @media (max-width: 600px) {
         .ret-cal-container label {
+          -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
           justify-content: space-between;
         }
+
         .ret-cal-input-item__info__text {
           left: auto;
           right: -13px;
+          -webkit-transform: unset;
           transform: unset;
         }
       }
@@ -825,6 +857,7 @@
               href="https://stonewaterfinancial.com/contact-us/"
               target="_blank"
               class="btn--regular"
+              rel="noopener"
               >Book an Appointment</a
             >
           </div>
