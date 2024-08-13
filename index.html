@@ -1000,6 +1000,7 @@
           const yearsToRetirement = ageRetirementValue - agePresentValue;
           const monthsToRetirement = yearsToRetirement * 12;
           const yearsOfRetirement = lifespan - ageRetirementValue;
+          const lifeExpectancy = 96;
 
           // // Calculate the future value of current savings
           // const FVCurrentSavings =
@@ -1049,14 +1050,14 @@
             rateOfReturn: parseFloat(returnRate.value ? returnRate.value : 0),
             postRateOfReturn: parseFloat(postReturnRate.value ? postReturnRate.value : 0),
             annualInflation: 0,
-            lifeExpectancy: 96,
+            lifeExpectancy,
           });
 
           resultHave.textContent = numberWithCommas(result.willHave);
           resultNeed.textContent = numberWithCommas(result.willNeed);
 
           // Update the chart with the new values
-          updateChart(result.willHave, result.willNeed);
+          updateChart(result.willHave, result.willNeed, lifeExpectancy - agePresentValue);
         }
 
         function calculateRetirementAmount({
@@ -1106,7 +1107,6 @@
           const retirementYears = lifeExpectancy - retirementAge;
 
           let willNeed;
-          console.log({ postRateOfReturn });
 
           if (postRateOfReturn === 0) {
             // If rate of return is 0, simply multiply the adjusted income by the number of years in retirement
@@ -1126,15 +1126,15 @@
         }
 
         // Function to update the ApexCharts chart
-        function updateChart(projectedBalance, requiredSavings) {
+        function updateChart(projectedBalance, requiredSavings, range) {
           const chart = ApexCharts.exec("balanceChart", "updateSeries", [
             {
               name: "You will have",
-              data: [projectedBalance],
+              data: divideIntoSymmetricGraphPoints(projectedBalance, 50, range),
             },
             {
               name: "You will need",
-              data: [requiredSavings],
+              data: divideIntoSymmetricGraphPoints(requiredSavings, 50, range),
             },
           ]);
         }
@@ -1143,14 +1143,22 @@
         function initializeChart() {
           const options = {
             chart: {
-              type: "bar",
+              height: 350,
+              type: "line",
               id: "balanceChart",
-            },
-            plotOptions: {
-              bar: {
-                horizontal: false,
-                columnWidth: "50%",
-                endingShape: "rounded",
+              dropShadow: {
+                enabled: true,
+                color: "#000",
+                top: 18,
+                left: 7,
+                blur: 10,
+                opacity: 0.2,
+              },
+              zoom: {
+                enabled: false,
+              },
+              toolbar: {
+                show: false,
               },
             },
             series: [
@@ -1163,14 +1171,36 @@
                 data: [0],
               },
             ],
+            colors: ["#77B6EA", "#545454"],
+            grid: {
+              borderColor: "#e7e7e7",
+              row: {
+                colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+                opacity: 0.5,
+              },
+            },
             xaxis: {
-              categories: ["Retirement Savings"],
+              title: {
+                text: "Retirement Savings",
+              },
+              type: "numeric",
+              tickAmount: 6,
+              tickPlacement: "on",
+              labels: {
+                rotate: 0,
+                formatter: function (val, index) {
+                  return val;
+                },
+              },
             },
             yaxis: {
               decimalsInFloat: 2,
               labels: {
                 formatter: function (val, index) {
-                  return `${val / 1000}k`;
+                  if (val / 1000000000 >= 1) return `${val / 1000000000}B`;
+                  else if (val / 1000000 >= 1) return `${val / 1000000}M`;
+                  else if (val / 100000 >= 1) return `${val / 1000}K`;
+                  return `${val}`;
                 },
               },
             },
@@ -1185,8 +1215,8 @@
             },
             stroke: {
               show: true,
+              // curve: "smooth",
               width: 2,
-              colors: ["transparent"],
             },
             fill: {
               colors: ["#252f52", "#29abe2"],
@@ -1198,6 +1228,13 @@
                   return "$ " + val.toFixed(2);
                 },
               },
+            },
+            legend: {
+              position: "top",
+              horizontalAlign: "right",
+              floating: true,
+              offsetY: -25,
+              offsetX: -5,
             },
           };
 
@@ -1211,6 +1248,25 @@
         // function to add commas to the numbers
         function numberWithCommas(x) {
           return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        function divideIntoSymmetricGraphPoints(peakValue, intervals = 6, range) {
+          const currentYear = new Date().getFullYear();
+          const points = [];
+          const stepY = peakValue / intervals; // Step size for y-axis values
+          const stepX = range / (2 * intervals); // Step size for x-axis values
+
+          // Generate graph points with non-decreasing years
+          for (let i = 0; i <= 2 * intervals; i++) {
+            const yValue = i <= intervals ? stepY * i : stepY * (2 * intervals - i);
+            const xValue = currentYear + Math.round(stepX * i);
+
+            points.push({
+              y: yValue.toFixed(2),
+              x: xValue.toString(),
+            });
+          }
+
+          return points;
         }
 
         // Add event listeners to all input fields to trigger calculation on input ~blur (when input field loses focus)~
