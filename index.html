@@ -1144,15 +1144,15 @@
           const options = {
             chart: {
               height: 350,
-              type: "line",
+              type: "area",
               id: "balanceChart",
               dropShadow: {
-                enabled: true,
+                enabled: false,
                 color: "#000",
                 top: 18,
                 left: 7,
                 blur: 10,
-                opacity: 0.2,
+                opacity: 0,
               },
               zoom: {
                 enabled: false,
@@ -1171,7 +1171,7 @@
                 data: [0],
               },
             ],
-            colors: ["#77B6EA", "#545454"],
+            colors: ["#545454", "#77B6EA"],
             grid: {
               borderColor: "#e7e7e7",
               row: {
@@ -1181,7 +1181,7 @@
             },
             xaxis: {
               title: {
-                text: "Retirement Savings",
+                text: "Years",
               },
               type: "numeric",
               tickAmount: 6,
@@ -1219,8 +1219,39 @@
               width: 2,
             },
             fill: {
-              colors: ["#252f52", "#29abe2"],
-              opacity: 1,
+              type: "gradient",
+              gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3,
+                stops: [0, 90, 100],
+                colorStops: [
+                  [
+                    {
+                      offset: 0,
+                      color: "#29abe2", // Start color for Series 2
+                      opacity: 0.3,
+                    },
+                    {
+                      offset: 100,
+                      color: "#29abe2", // End color for Series 2
+                      opacity: 0.1,
+                    },
+                  ],
+                  [
+                    {
+                      offset: 0,
+                      color: "black", // Start color for Series 1
+                      opacity: 0,
+                    },
+                    {
+                      offset: 100,
+                      color: "transparent", // End color for Series 1
+                      opacity: 0,
+                    },
+                  ],
+                ],
+              },
             },
             tooltip: {
               y: {
