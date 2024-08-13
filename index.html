@@ -765,7 +765,7 @@
             </div>
             <div class="ret-cal-input-item">
               <label for="return_rate">
-                Rate of Return
+                Pre-retirement Rate of Return
                 <div class="ret-cal-input-item__info">
                   <button type="button" class="ret-cal-input-item__info__btn">
                     <svg
@@ -783,7 +783,9 @@
                       </g>
                     </svg>
                   </button>
-                  <div class="ret-cal-input-item__info__text">Expected rate of return.</div>
+                  <div class="ret-cal-input-item__info__text">
+                    Expected rate of return before retirement.
+                  </div>
                 </div>
               </label>
               <div class="ret-cal-input__group">
@@ -799,10 +801,49 @@
                 <span class="ret-cal-input__group__unit unit--end">&percnt;</span>
               </div>
             </div>
+            <div class="ret-cal-input-item">
+              <label for="post_return_rate">
+                Post-retirement Rate of Return
+                <div class="ret-cal-input-item__info">
+                  <button type="button" class="ret-cal-input-item__info__btn">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="50"
+                      height="50"
+                      viewBox="0 0 16 16"
+                    >
+                      <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                          stroke-width="1.5"
+                          d="M8 14.667c3.667 0 6.667-3 6.667-6.667s-3-6.667-6.666-6.667c-3.667 0-6.667 3-6.667 6.667s3 6.667 6.667 6.667ZM8 5.333v3.334"
+                        />
+                        <path stroke-width="2" d="M7.996 10.667h.006" />
+                      </g>
+                    </svg>
+                  </button>
+                  <div class="ret-cal-input-item__info__text">
+                    Expected rate of return after retirement.
+                  </div>
+                </div>
+              </label>
+              <div class="ret-cal-input__group">
+                <input
+                  type="number"
+                  name="post_return_rate"
+                  id="post_return_rate"
+                  inputmode="numeric"
+                  placeholder="6"
+                  value="0"
+                  min="0"
+                />
+                <span class="ret-cal-input__group__unit unit--end">&percnt;</span>
+              </div>
+            </div>
           </div>
 
           <div class="ret-cal-inputs__group">
             <p><small>This calculator assumes a 2% annual inflation rate.</small></p>
+            <p><small>This calculator assumes 95 years of life expectancy.</small></p>
           </div>
         </div>
 
@@ -881,6 +922,7 @@
         const ageRetirement = document.getElementById("age_retirement");
         const retirementAnnualIncome = document.getElementById("retirement_annual_income");
         const returnRate = document.getElementById("return_rate");
+        const postReturnRate = document.getElementById("post_return_rate");
         const monthlyContributionRangeMin = document
           .getElementById("monthly_contribution_range")
           .getAttribute("min");
@@ -947,51 +989,140 @@
           // const incrementValue = parseFloat(increment.value) / 100 || 0;
           const currentSavingsValue = parseFloat(currentSavings.value) || 0;
           const monthlyContributionValue = parseFloat(monthlyContribution.value) || 0;
-          const ageRetirementValue = parseFloat(ageRetirement.value) || 0;
+          const ageRetirementValue =
+            parseFloat(
+              ageRetirement.value > agePresentValue ? ageRetirement.value : agePresent.value
+            ) || 0;
           const retirementAnnualIncomeValue = parseFloat(retirementAnnualIncome.value) || 0;
           const returnRateValue = parseFloat(returnRate.value) / 100 || 0;
+          const postReturnRateValue = parseFloat(postReturnRate.value) / 100 || 0;
 
           const yearsToRetirement = ageRetirementValue - agePresentValue;
           const monthsToRetirement = yearsToRetirement * 12;
           const yearsOfRetirement = lifespan - ageRetirementValue;
 
-          // Calculate the future value of current savings
-          const FVCurrentSavings =
-            currentSavingsValue * Math.pow(1 + returnRateValue, yearsToRetirement);
+          // // Calculate the future value of current savings
+          // const FVCurrentSavings =
+          //   currentSavingsValue * Math.pow(1 + returnRateValue, yearsToRetirement);
 
-          // Calculate the future value of monthly contributions
-          const FVMonthlyContributions =
-            monthlyContributionValue *
-            12 *
-            ((Math.pow(1 + returnRateValue, yearsToRetirement) - 1) / returnRateValue);
+          // // Calculate the future value of monthly contributions
+          // const FVMonthlyContributions =
+          //   monthlyContributionValue *
+          //   12 *
+          //   ((Math.pow(1 + returnRateValue, yearsToRetirement) - 1) / returnRateValue);
 
-          // Calculate the projected balance on retirement
-          const projectedBalance = FVCurrentSavings + FVMonthlyContributions;
-          resultHave.textContent = numberWithCommas(projectedBalance.toFixed(2));
+          // // Calculate the projected balance on retirement
+          // const projectedBalance = FVCurrentSavings + FVMonthlyContributions;
+          // resultHave.textContent = numberWithCommas(projectedBalance.toFixed(2));
 
-          // Calculate the required savings for desired retirement income
-          const requiredSavings =
-            (retirementAnnualIncomeValue *
-              ((Math.pow(1 + inflationRate, yearsOfRetirement) - 1) /
-                (returnRateValue - inflationRate))) /
-            Math.pow(1 + inflationRate, yearsOfRetirement);
-          resultNeed.textContent = numberWithCommas(requiredSavings.toFixed(2));
+          // // Calculate the required savings for desired retirement income
+          // const requiredSavings =
+          //   (retirementAnnualIncomeValue *
+          //     ((Math.pow(1 + inflationRate, yearsOfRetirement) - 1) /
+          //       (returnRateValue - inflationRate))) /
+          //   Math.pow(1 + inflationRate, yearsOfRetirement);
+          // resultNeed.textContent = numberWithCommas(requiredSavings.toFixed(2));
 
-          // Calculate the additional monthly contribution needed
-          const additionalSavingsNeeded = requiredSavings - projectedBalance;
-          let additionalMonthlyContribution = 0;
-          if (additionalSavingsNeeded > 0) {
-            additionalMonthlyContribution =
-              (additionalSavingsNeeded * returnRateValue) /
-              (12 * (Math.pow(1 + returnRateValue, monthsToRetirement) - 1));
-          }
-          // monthlyContributionTarget.textContent = (additionalMonthlyContribution / 1000).toFixed(1);
+          // // Calculate the additional monthly contribution needed
+          // const additionalSavingsNeeded = requiredSavings - projectedBalance;
+          // let additionalMonthlyContribution = 0;
+          // if (additionalSavingsNeeded > 0) {
+          //   additionalMonthlyContribution =
+          //     (additionalSavingsNeeded * returnRateValue) /
+          //     (12 * (Math.pow(1 + returnRateValue, monthsToRetirement) - 1));
+          // }
+          // // monthlyContributionTarget.textContent = (additionalMonthlyContribution / 1000).toFixed(1);
 
-          // show retirement age
+          // // show retirement age
+          // document.getElementById("retirement_age_text").textContent = ageRetirementValue;
+          // Update the chart with the new values
+          // updateChart(projectedBalance, requiredSavings);
+
           document.getElementById("retirement_age_text").textContent = ageRetirementValue;
 
+          const result = calculateRetirementAmount({
+            currentAge: agePresentValue,
+            currentSavings: currentSavingsValue,
+            monthlyContribution: monthlyContributionValue,
+            retirementAge: ageRetirementValue,
+            retirementTargetAnnualIncome: retirementAnnualIncomeValue,
+            rateOfReturn: parseFloat(returnRate.value ? returnRate.value : 0),
+            postRateOfReturn: parseFloat(postReturnRate.value ? postReturnRate.value : 0),
+            annualInflation: 0,
+            lifeExpectancy: 96,
+          });
+
+          resultHave.textContent = numberWithCommas(result.willHave);
+          resultNeed.textContent = numberWithCommas(result.willNeed);
+
           // Update the chart with the new values
-          updateChart(projectedBalance, requiredSavings);
+          updateChart(result.willHave, result.willNeed);
+        }
+
+        function calculateRetirementAmount({
+          currentAge,
+          currentSavings,
+          monthlyContribution,
+          retirementAge,
+          retirementTargetAnnualIncome,
+          rateOfReturn,
+          postRateOfReturn,
+          annualInflation,
+          lifeExpectancy,
+        }) {
+          // Convert percentages to decimals
+          const rateOfReturnDecimal = rateOfReturn / 100;
+          const postRateOfReturnDecimal = postRateOfReturn / 100;
+          const annualInflationDecimal = annualInflation / 100;
+
+          // Calculate the number of years to retirement
+          const yearsToRetirement = retirementAge - currentAge;
+
+          // Calculate future value of current savings
+          const futureValueOfSavings =
+            currentSavings * Math.pow(1 + rateOfReturnDecimal, yearsToRetirement);
+
+          let futureValueOfContributions;
+
+          if (rateOfReturn === 0) {
+            // If the rate of return is 0, the future value of contributions is simply the sum of all contributions
+            futureValueOfContributions = monthlyContribution * yearsToRetirement * 12;
+          } else {
+            // Calculate future value of monthly contributions with a non-zero rate of return
+            futureValueOfContributions =
+              monthlyContribution *
+              12 *
+              ((Math.pow(1 + rateOfReturnDecimal, yearsToRetirement) - 1) / rateOfReturnDecimal);
+          }
+
+          // Total amount "You Will Have"
+          const willHave = futureValueOfSavings + futureValueOfContributions;
+
+          // Adjust the retirement target annual income for inflation over the years to retirement
+          const adjustedRetirementIncome =
+            retirementTargetAnnualIncome * Math.pow(1 + annualInflationDecimal, yearsToRetirement);
+
+          // Number of years in retirement
+          const retirementYears = lifeExpectancy - retirementAge;
+
+          let willNeed;
+          console.log({ postRateOfReturn });
+
+          if (postRateOfReturn === 0) {
+            // If rate of return is 0, simply multiply the adjusted income by the number of years in retirement
+            willNeed = adjustedRetirementIncome * retirementYears;
+          } else {
+            // Otherwise, calculate the present value of an annuity
+            willNeed =
+              adjustedRetirementIncome *
+              ((1 - Math.pow(1 + postRateOfReturnDecimal, -retirementYears)) /
+                postRateOfReturnDecimal);
+          }
+
+          return {
+            willHave: willHave.toFixed(0),
+            willNeed: willNeed.toFixed(0),
+          };
         }
 
         // Function to update the ApexCharts chart
@@ -1090,6 +1221,7 @@
         ageRetirement.addEventListener("input", calculate);
         retirementAnnualIncome.addEventListener("input", calculate);
         returnRate.addEventListener("input", calculate);
+        postReturnRate.addEventListener("input", calculate);
 
         // Initialize the chart and perform the initial calculation
         initializeChart();
