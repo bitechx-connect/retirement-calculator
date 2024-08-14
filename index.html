@@ -1049,7 +1049,7 @@
             retirementTargetAnnualIncome: retirementAnnualIncomeValue,
             rateOfReturn: parseFloat(returnRate.value ? returnRate.value : 0),
             postRateOfReturn: parseFloat(postReturnRate.value ? postReturnRate.value : 0),
-            annualInflation: 0,
+            annualInflation: 2,
             lifeExpectancy,
           });
 
@@ -1100,23 +1100,23 @@
           const willHave = futureValueOfSavings + futureValueOfContributions;
 
           // Adjust the retirement target annual income for inflation over the years to retirement
-          const adjustedRetirementIncome =
+          let adjustedRetirementIncome =
             retirementTargetAnnualIncome * Math.pow(1 + annualInflationDecimal, yearsToRetirement);
 
           // Number of years in retirement
           const retirementYears = lifeExpectancy - retirementAge;
 
-          let willNeed;
+          let willNeed = 0;
 
           if (postRateOfReturn === 0) {
             // If rate of return is 0, simply multiply the adjusted income by the number of years in retirement
             willNeed = adjustedRetirementIncome * retirementYears;
           } else {
-            // Otherwise, calculate the present value of an annuity
-            willNeed =
-              adjustedRetirementIncome *
-              ((1 - Math.pow(1 + postRateOfReturnDecimal, -retirementYears)) /
-                postRateOfReturnDecimal);
+            // Otherwise, calculate the present value of an inflation-adjusted annuity
+            for (let i = 0; i < retirementYears; i++) {
+              willNeed += adjustedRetirementIncome / Math.pow(1 + postRateOfReturnDecimal, i + 1);
+              adjustedRetirementIncome *= 1 + annualInflationDecimal;
+            }
           }
 
           return {
